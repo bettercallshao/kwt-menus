@@ -1,0 +1,23 @@
+name: windows-shell
+help: Collection of common windows shell commands
+actions:
+- name: windows-version
+  help: Show windows version
+  template: winver
+- name: ping
+  help: Ping a party in network
+  template: ping {{.host}}
+  params:
+  - name: host
+    help: Host to ping
+    value: google.com
+- name: ip
+  help: Show my ip adresses
+  template: ipconfig
+- name: domain-lookup
+  help: Show domain name
+  template: nslookup {{.domain}}
+  params:
+  - name: domain
+    help: domain to check
+    value: google.com
