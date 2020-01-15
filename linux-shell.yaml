@@ -1,0 +1,13 @@
+name: linux-shell
+help: Collection of common linux shell commands
+actions:
+- name: ping
+  help: Ping a party in network
+  template: ping {{.host}}
+  params:
+  - name: host
+    help: Host to ping
+    value: google.com
+- name: ip
+  help: Show my ip adresses
+  template: ifconfig
