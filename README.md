@@ -1,2 +1,2 @@
 # kut-menus
-Menu samples for kut
+Official menus for kut
