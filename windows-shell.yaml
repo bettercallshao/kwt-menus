@@ -13,7 +13,7 @@ actions:
     value: google.com
 - name: ip
   help: Show my ip adresses
-  template: ipconfig
+  template: "ipconfig | findstr IPv4"
 - name: domain-lookup
   help: Show domain name
   template: nslookup {{.domain}}
@@ -21,3 +21,10 @@ actions:
   - name: domain
     help: domain to check
     value: google.com
+- name: directory-structure
+  help: Show directory structure
+  template: cd {{.path}} && tree /A
+  params:
+  - name: path
+    help: directory to show
+    value: " "
