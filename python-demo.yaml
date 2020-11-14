@@ -1,0 +1,115 @@
+name: python-demo
+version: v0.1.0
+help: Python commands for demo
+actions:
+- name: forex-rate
+  help: Print forex rates
+  template: |
+    python3 -u -c "
+    import urllib.request
+    import urllib.parse
+    import json
+
+    url = 'https://api.exchangeratesapi.io/latest?base={{.base}}&symbols={{.symbols}}'
+    r = json.load(urllib.request.urlopen(url))
+
+    date = r['date']
+    rates = r['rates']
+
+    print(f'On {date}')
+    print('\n'.join(
+      f'1 {{.base}} can buy {rates[symbol]:.2f} {symbol}'
+      for symbol in rates
+    ))
+    "
+  params:
+  - name: base
+    help: Base currency
+    value: USD
+  - name: symbols
+    help: Comma separated currency symbol list
+    value: CAD,GBP
+- name: mortgage-calculator
+  help: Calculate mortgage payment
+  template: |
+    python3 -u -c "
+    import math
+
+    scale = 12 * {{.frequency}}
+    r = {{.rate}} / 100 / scale
+    n = {{.term}} * scale
+    p = {{.principal}}
+    a = math.pow((1+r), n)
+    c = r * p * a / (a - 1)
+
+    print(f'For a loan of \${p:,} at yearly rate of {{.rate}}% to be paid off in {{.term}} years with {{.frequency}} payments per month, each payment will be \${c:,.2f}')
+    "
+  params:
+  - name: principal
+    help: Principal amount for the loan
+    value: 100000
+  - name: rate
+    help: Yearly interest rate in percent
+    value: 3.5
+  - name: term
+    help: Length of term in number of years
+    value: 25
+  - name: frequency
+    help: Frequency of payment in times per month
+    value: 1
+- name: bit-expander
+  help: Convert between decimal, hex, and bit representations
+  template: |
+    python3 -u -c "
+    import math
+
+    convert = lambda x: abs(int(x, 0))
+    n = convert('{{.input}}')
+    for bit in '{{if .flip}} {{.flip}} {{end}}'.split(','):
+      if bit:
+        n ^= (1 << convert(bit))
+
+    wdith = {{.width}}
+
+    def make_header(n):
+      return f'{n}'
+
+    def make_indicator(d, b):
+      return '✔️' if b else ''
+
+    def make_row(l):
+      return ''.join(f'{a:5}' for a in l) + '\n'
+
+    def make_table(l):
+      return ''.join(l)
+
+    def get_digits(n):
+      n = max(n, 2)
+      return int(math.ceil(math.log(0.1 + n, 2) / wdith) * wdith)
+
+    def truth_digit(n, d):
+      return (n >> d) & 1 > 0
+
+    def count_backward(n):
+      return reversed(range(n))
+
+    def segment_list(l):
+      return [l[i:i+wdith] for i in range(0, len(l), wdith)]
+
+    def get_table(n):
+      l = get_digits(n)
+      header_lists = segment_list([make_header(b) for b in count_backward(l)])
+      indica_lists = segment_list([make_indicator(b, truth_digit(n, b)) for b in count_backward(l)])
+      return  make_table([make_row(header_lists[i]) + make_row(indica_lists[i]) for i in range(len(header_lists))])
+
+    print(f'hex: {hex(n)}\ndec: {n}\n\n{get_table(n)}')
+    "
+  params:
+  - name: input
+    help: Number to display, use 0xa0 for hex or use decimal.
+    value: 0xdeadbeef
+  - name: flip
+    help: Comma separated list of bits to flip
+  - name: width
+    help: Number of bits per row
+    value: 8
