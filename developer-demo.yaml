@@ -1,0 +1,11 @@
+name: developer-demo
+version: v0.1.0
+help: Developer commands for demo
+actions:
+- name: find-vim
+  help: Find the first file with given name in directory and edit it with vim
+  template: vim $(find . -name '{{.filename}}' | head -1)
+  params:
+  - name: filename
+    help: Target file name
+    value: README.md
