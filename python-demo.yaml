@@ -2,6 +2,9 @@ name: python-demo
 version: v0.1.0
 help: Python commands for demo
 actions:
+- name: uuid
+  help: Generate a UUID
+  template: python -c 'import uuid; print(str(uuid.uuid4()))'
 - name: forex-rate
   help: Print forex rates
   template: |
@@ -113,3 +116,31 @@ actions:
   - name: width
     help: Number of bits per row
     value: 8
+- name: csv-to-markdown
+  help: Convert a CSV to markdown table
+  template: |
+    python -u -c "
+    data = '''{{.data}}'''
+    ll = []
+    for line in data.split('\n'):
+      line = line.strip()
+      if not line:
+        continue
+      ll.append([item.strip() for item in line.split(',')])
+    w = len(ll[0])
+    flip = '{{.transform}}' == 'f'
+    if flip:
+      ll = zip(*ll)
+      ll.insert(0, [''] * w)
+    md = '{{.output}}' == 'm'
+    print('|'.join(ll[0]))
+    print('|'.join(['-'] * w))
+    for l in ll[1:]:
+      print('|'.join(l))
+    print('|'.join([''] * w))
+    "
+  params:
+  - name: transform
+    help: Apply transform, f for flipped
+  - name: data
+    help: The CSV data
