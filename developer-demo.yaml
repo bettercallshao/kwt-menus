@@ -4,8 +4,29 @@ help: Developer commands for demo
 actions:
 - name: find-vim
   help: Find the first file with given name in directory and edit it with vim
-  template: vim $(find . -name '{{.filename}}' | head -1)
+  template: vim $(find . -name '{{.target}}' | head -1)
   params:
-  - name: filename
-    help: Target file name
+  - &target
+    name: target
+    help: Target file name / directory
     value: README.md
+- name: unix-ending
+  help: Coerce target files into unix line ending
+  template: find {{.target}} -type f | xargs sed -i 's/\r$//'
+  params:
+  - *target
+- name: dos-ending
+  help: Coerce target files into DOS line ending
+  template: find {{.target}} -type f | xargs sed -i 's/$/\r/'
+  params:
+  - *target
+- name: replace-all
+  help: Replace all occurances of a pattern with another
+  template: find {{.target}} -type f | xargs sed -i 's|{{if .from}}{{.from}}{{end}}|{{if .to}}{{.to}}{{end}}|'
+  params:
+  - <<: *target
+    value: .
+  - name: from
+    help: Replace from pattern
+  - name: to
+    help: Replace to pattern
