@@ -1,0 +1,46 @@
+name: windows-kutd
+version: v0.1.0
+help: Manage kutd on windows (only tested on Win10)
+actions:
+- name: shortcut
+  help: Create a shortcut for kutd
+  template: |
+    {{if .source}}
+    SET SOURCE={{.source}}
+    {{else}}
+    FOR /F "tokens=*" %%g IN ('where kutd') do (SET SOURCE=%%g)
+    {{end}}
+    If not exist %SOURCE% (
+      echo kutd.exe not found. Quitting.
+      Exit /b
+    )
+
+    echo Set oWS = WScript.CreateObject("WScript.Shell") > CreateShortcut.vbs
+    echo sLinkFile = "{{.target}}" >> CreateShortcut.vbs
+    echo Set oLink = oWS.CreateShortcut(sLinkFile) >> CreateShortcut.vbs
+    echo oLink.WindowStyle = 7 >> CreateShortcut.vbs
+    echo oLink.IconLocation = "%SystemRoot%\System32\SHELL32.dll,259" >> CreateShortcut.vbs
+    echo oLink.TargetPath = "%SOURCE%" >> CreateShortcut.vbs
+    echo oLink.Save >> CreateShortcut.vbs
+    cscript /nologo CreateShortcut.vbs
+    del CreateShortcut.vbs
+  params:
+  - &source
+    name: source
+    help: Path to kutd.exe, a guess is made by default
+  - &target
+    name: target
+    help: Path to shortcut
+- name: desktop
+  help: Create a shortcut for kutd on desktop
+  template: kut windows-kutd shortcut --target "%userprofile%\Desktop\kutd.lnk" {{if .source}}--source {{.source}}{{end}}
+  params:
+  - *source
+- name: startup-add
+  help: Add kutd to run on startup
+  template: kut windows-kutd shortcut --target "%userprofile%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\kutd.lnk" {{if .source}}--source {{.source}}{{end}}
+  params:
+  - *source
+- name: startup-remove
+  help: Remove kutd from running on startup
+  template: del "%userprofile%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\kutd.lnk"
