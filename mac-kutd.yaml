@@ -1,0 +1,68 @@
+name: mac-kutd
+version: v0.1.0
+help: Manage kutd on Mac (only tested on Catalina)
+actions:
+- name: desktop
+  help: Create a shortcut for kutd on desktop
+  template: |
+    {{if .source}}
+    SOURCE={{.source}}
+    {{else}}
+    SOURCE=$(which kutd)
+    {{end}}
+
+    TARGET=~/Desktop/kutd.command
+    echo $SOURCE > $TARGET
+    chmod +x $TARGET
+  params:
+  - &source
+    name: source
+    help: Path to kutd, a guess is made by default
+- name: startup-add
+  help: Add kutd to run on startup
+  template: |
+    {{if .source}}
+    SOURCE={{.source}}
+    {{else}}
+    SOURCE=$(which kutd)
+    {{end}}
+
+    LABEL=com.github.bettercallshao.kutd
+    PDIR=~/Library/LaunchAgents
+    PLIST=$PDIR/$LABEL.plist
+
+    mkdir -p $PDIR
+    cat <<EOF > $PLIST
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN"
+      "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
+      <key>Label</key>
+      <string>$LABEL</string>
+      <key>ServiceDescription</key>
+      <string>Kutd server</string>
+      <key>ProgramArguments</key>
+      <array>
+        <string>$SOURCE</string>
+      </array>
+      <key>KeepAlive</key>
+      <true/>
+    </dict>
+    </plist>
+    EOF
+
+    launchctl unload $PLIST
+    sleep 1
+    launchctl load $PLIST
+    launchctl start $LABEL
+  params:
+  - *source
+- name: startup-remove
+  help: Remove kutd from running on startup
+  template: |
+    LABEL=com.github.bettercallshao.kutd
+    PDIR=~/Library/LaunchAgents
+    PLIST=$PDIR/$LABEL.plist
+    launchctl unload $PLIST
+    rm $PLIST
