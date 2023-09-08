@@ -1,33 +1,33 @@
-name: mac-kutd
+name: mac-kwtd
 version: v0.1.0
-help: Manage kutd on Mac (only tested on Catalina)
+help: Manage kwtd on Mac (only tested on Catalina)
 actions:
 - name: desktop
-  help: Create a shortcut for kutd on desktop
+  help: Create a shortcut for kwtd on desktop
   template: |
     {{if .source}}
     SOURCE={{.source}}
     {{else}}
-    SOURCE=$(which kutd)
+    SOURCE=$(which kwtd)
     {{end}}
 
-    TARGET=~/Desktop/kutd.command
+    TARGET=~/Desktop/kwtd.command
     echo $SOURCE > $TARGET
     chmod +x $TARGET
   params:
   - &source
     name: source
-    help: Path to kutd, a guess is made by default
+    help: Path to kwtd, a guess is made by default
 - name: startup-add
-  help: Add kutd to run on startup
+  help: Add kwtd to run on startup
   template: |
     {{if .source}}
     SOURCE={{.source}}
     {{else}}
-    SOURCE=$(which kutd)
+    SOURCE=$(which kwtd)
     {{end}}
 
-    LABEL=com.github.bettercallshao.kutd
+    LABEL=com.github.bettercallshao.kwtd
     PDIR=~/Library/LaunchAgents
     PLIST=$PDIR/$LABEL.plist
 
@@ -59,9 +59,9 @@ actions:
   params:
   - *source
 - name: startup-remove
-  help: Remove kutd from running on startup
+  help: Remove kwtd from running on startup
   template: |
-    LABEL=com.github.bettercallshao.kutd
+    LABEL=com.github.bettercallshao.kwtd
     PDIR=~/Library/LaunchAgents
     PLIST=$PDIR/$LABEL.plist
     launchctl unload $PLIST

@@ -1,2 +1,2 @@
-# kut-menus
-Official menus for kut
+# kwt-menus
+Official menus for kwt
